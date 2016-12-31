@@ -1,0 +1,4 @@
+moduleName=gordius.lists.gelos.module
+moduleVersion=1.0
+extensionClasses=gordius.lists.ListExtension
+staticExtensionClasses=gordius.lists.ListStaticExtension
