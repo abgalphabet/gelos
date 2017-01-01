@@ -3,6 +3,8 @@ package gordius.lists
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static gordius.lists.ListExtension.lastN
+import static gordius.lists.WorkingWithLists.last
 import static org.hamcrest.Matchers.*
 import static spock.util.matcher.HamcrestSupport.expect
 import static spock.util.matcher.HamcrestSupport.that
@@ -20,27 +22,36 @@ class ListsSpecification extends Specification {
         res0: Int = 8
 */
         expect:
-        list.asImmutable().last() == element
+        last(list) == element
+        list.last() == element
+        list[-1] == element
 
         where:
-        list               | element
-        [1, 1, 2, 3, 5, 8] | 8
-        [1, 1, 2, 3, 8, 5] | 5
-        [2]                | 2
+        list               || element
+        [1, 1, 2, 3, 5, 8] || 8
+        [1, 1, 2, 3, 8, 5] || 5
+        [2]                || 2
     }
 
     @Unroll
-    "P01 (*) Find the last element of #list  would throw exception"() {
+    "P01 (*) Find the last element of empty list would throw exception"(Class exception, Closure lastAndExpectException) {
 /*
         Example:
         scala> last(List(1, 1, 2, 3, 5, 8))
         res0: Int = 8
 */
         when:
-        [].last()
+        lastAndExpectException()
 
         then:
-        thrown(NoSuchElementException)
+        thrown(exception)
+
+        where:
+        exception                      | lastAndExpectException
+        NoSuchElementException         | { last([]) }
+        NoSuchElementException         | { [].last() }
+        ArrayIndexOutOfBoundsException | { [][-1] }
+
     }
 
     @Unroll
@@ -51,12 +62,14 @@ class ListsSpecification extends Specification {
         res0: Int = 5
 */
         expect:
-        list.asImmutable().lastEx(1) == element
+        lastN(list, 1) == element
+        list.lastN(1) == element
+        list[-2] == element
 
         where:
-        list               | element
-        [1, 1, 2, 3, 5, 8] | 5
-        [1, 1, 2, 3, 5]    | 3
+        list               || element
+        [1, 1, 2, 3, 5, 8] || 5
+        [1, 1, 2, 3, 5]    || 3
     }
 
     @Unroll
@@ -67,7 +80,7 @@ class ListsSpecification extends Specification {
         res0: Int = 5
         */
         when:
-        list.asImmutable().lastEx(lastN)
+        list.lastN(lastN)
 
         then:
         thrown(NoSuchElementException)

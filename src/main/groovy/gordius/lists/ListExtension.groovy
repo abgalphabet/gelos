@@ -2,11 +2,9 @@ package gordius.lists
 /**
  * Created by Arthur on 28/11/14.
  */
-public class ListExtension {
-    static def lastEx(List self, int last = 0) {
-        if (!self || self.size() <= last) throw new NoSuchElementException()
-
-        self.get(self.size() - 1 - last)
+class ListExtension {
+    static def lastN(List self, int n = 0) {
+        WorkingWithLists.lastN(self, n)
     }
 
     static def nth(List self, int i) {
