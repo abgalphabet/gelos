@@ -18,21 +18,39 @@ class WorkingWithLists {
     }
 
     static lastN(List list, final int n) {
-        _lastN(list, n, 0).last()
+        def _lastN
+        _lastN = { List ls, final int i ->
+            if (i == 0) ls.head()
+            else _lastN.trampoline(ls.tail(), i-1)
+        }.trampoline()
+
+        if (list) _lastN(list, size(list) - n - 1)
+        else throw new NoSuchElementException()
     }
 
-    private static _lastN(List list, final int n, final int count) {
-        int newCount = count + 1
+    @TailRecursive
+    static nth(List list, final int n) {
+        if (n == 0) list.head()
+        else nth(list.tail(), n-1)
+    }
 
-        if (list == [list.head()]) {
-            if (newCount <= n) throw new NoSuchElementException()
-            else [newCount, list.head()]
-        }
-        else {
-            def (size, item) = _lastN(list.tail(), n, newCount)
-            if (n == size - newCount) [size, list.head()]
-            else [size, item]
-        }
+    static size(List list) {
+        def _size
+        _size = { List ls, int count ->
+            if (ls.empty) count
+            else _size.trampoline(ls.tail(), count+1)
+        }.trampoline()
 
+        _size(list, 0)
+    }
+
+    static reverse(List list) {
+        def _reverse
+        _reverse = { List ls, Closure state ->
+            if (ls.empty) state([])
+            else _reverse.trampoline(ls.tail(), { it << ls.head() } >> state )
+        }.trampoline()
+
+        _reverse(list, {it})
     }
 }

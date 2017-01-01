@@ -5,6 +5,9 @@ import spock.lang.Unroll
 
 import static gordius.lists.ListExtension.lastN
 import static gordius.lists.WorkingWithLists.last
+import static gordius.lists.WorkingWithLists.nth
+import static gordius.lists.WorkingWithLists.reverse
+import static gordius.lists.WorkingWithLists.size
 import static org.hamcrest.Matchers.*
 import static spock.util.matcher.HamcrestSupport.expect
 import static spock.util.matcher.HamcrestSupport.that
@@ -103,16 +106,16 @@ class ListsSpecification extends Specification {
         res0: Int = 2
         */
         expect:
+        nth(list, k) == element
         list.asImmutable().nth(k) == element
 
         where:
-        list               | k | element
-        [1, 1, 2, 3, 5, 8] | 2 | 2
-        [1, 1, 2, 3, 5, 8] | 0 | 1
-        [1, 1, 2, 3, 5, 8] | 4 | 5
+        list               | k || element
+        [1, 1, 2, 3, 5, 8] | 2 || 2
+        [1, 1, 2, 3, 5, 8] | 0 || 1
+        [1, 1, 2, 3, 5, 8] | 4 || 5
 
     }
-
 
     @Unroll
     "P04 (*) Find the number of elements of #list"(List list, int length) {
@@ -123,14 +126,15 @@ class ListsSpecification extends Specification {
         */
 
         expect:
-        list.asImmutable().size() == length
+        size(list) == length
+        list.inject(0) { int sum, def item -> sum+1 } == length
 
         where:
-        list               | length
-        [1, 1, 2, 3, 5, 8] | 6
-        [1, 1, 2, 3, 5]    | 5
-        [1]                | 1
-        []                 | 0
+        list               || length
+        [1, 1, 2, 3, 5, 8] || 6
+        [1, 1, 2, 3, 5]    || 5
+        [1]                || 1
+        []                 || 0
     }
 
     @Unroll
@@ -142,14 +146,15 @@ class ListsSpecification extends Specification {
         */
 
         expect:
-        list.asImmutable().asImmutable().reverse() == reversed
+        reverse(list) == reversed
+        list.asImmutable().reverse() == reversed
 
         where:
-        list               | reversed
-        [1, 1, 2, 3, 5, 8] | [8, 5, 3, 2, 1, 1]
-        [1, 1, 2, 3, 5]    | [5, 3, 2, 1, 1]
-        [1]                | [1]
-        []                 | []
+        list               || reversed
+        [1, 1, 2, 3, 5, 8] || [8, 5, 3, 2, 1, 1]
+        [1, 1, 2, 3, 5]    || [5, 3, 2, 1, 1]
+        [1]                || [1]
+        []                 || []
     }
 
     @Unroll

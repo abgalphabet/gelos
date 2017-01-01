@@ -7,10 +7,8 @@ class ListExtension {
         WorkingWithLists.lastN(self, n)
     }
 
-    static def nth(List self, int i) {
-        if (!self || i > self.size() - 1 || i < 0) throw new NoSuchElementException()
-
-        self[i]
+    static def nth(List self, int n) {
+        WorkingWithLists.nth(self, n)
     }
 
     static def isPalindrome(List self) {
