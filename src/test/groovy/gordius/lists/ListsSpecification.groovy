@@ -4,10 +4,27 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static gordius.lists.ListExtension.lastN
+import static gordius.lists.WorkingWithLists.combinations
+import static gordius.lists.WorkingWithLists.decode
+import static gordius.lists.WorkingWithLists.dropNth
+import static gordius.lists.WorkingWithLists.duplicate
+import static gordius.lists.WorkingWithLists.duplicateN
+import static gordius.lists.WorkingWithLists.encode
+import static gordius.lists.WorkingWithLists.encodeDirect
+import static gordius.lists.WorkingWithLists.encodeModified
+import static gordius.lists.WorkingWithLists.flatten
+import static gordius.lists.WorkingWithLists.group3
+import static gordius.lists.WorkingWithLists.insertAt
+import static gordius.lists.WorkingWithLists.isPalindrome
 import static gordius.lists.WorkingWithLists.last
 import static gordius.lists.WorkingWithLists.nth
+import static gordius.lists.WorkingWithLists.pack
+import static gordius.lists.WorkingWithLists.range
+import static gordius.lists.WorkingWithLists.removeAt
 import static gordius.lists.WorkingWithLists.reverse
+import static gordius.lists.WorkingWithLists.rotate
 import static gordius.lists.WorkingWithLists.size
+import static gordius.lists.WorkingWithLists.compress
 import static org.hamcrest.Matchers.*
 import static spock.util.matcher.HamcrestSupport.expect
 import static spock.util.matcher.HamcrestSupport.that
@@ -127,7 +144,7 @@ class ListsSpecification extends Specification {
 
         expect:
         size(list) == length
-        list.inject(0) { int sum, def item -> sum+1 } == length
+        list.inject(0) { int sum, def item -> sum + 1 } == length
 
         where:
         list               || length
@@ -158,7 +175,7 @@ class ListsSpecification extends Specification {
     }
 
     @Unroll
-    "P06 (*) Find out whether #list is a palindrome"(List list, boolean isPalindrome) {
+    "P06 (*) Find out whether #list is a palindrome"(List list, boolean expected) {
         /*
         Example:
         scala> isPalindrome(List(1, 2, 3, 2, 1))
@@ -166,15 +183,16 @@ class ListsSpecification extends Specification {
         */
 
         expect:
-        list.asImmutable().isPalindrome() == isPalindrome
+        isPalindrome(list) == expected
+        list.asImmutable().isPalindrome() == expected
 
         where:
-        list               | isPalindrome
-        [1, 2, 3, 3, 2, 1] | true
-        [1, 2, 3, 2, 1]    | true
-        [1, 1, 2, 3, 5]    | false
-        [1]                | true
-        []                 | true
+        list               || expected
+        [1, 2, 3, 3, 2, 1] || true
+        [1, 2, 3, 2, 1]    || true
+        [1, 1, 2, 3, 5]    || false
+        [1]                || true
+        []                 || true
     }
 
     @Unroll
@@ -186,14 +204,15 @@ class ListsSpecification extends Specification {
         */
 
         expect:
+        flatten(list.asImmutable()) == flattened
         list.asImmutable().flatten() == flattened
 
         where:
-        list                      | flattened
-        []                        | []
-        [1, 1, 3, 5, 8]           | [1, 1, 3, 5, 8]
-        [[1, 1], [3, [5, 8]]]     | [1, 1, 3, 5, 8]
-        [[1, [2, [3, [4, [5]]]]]] | [1, 2, 3, 4, 5]
+        list                      || flattened
+        []                        || []
+        [1, 1, 3, 5, 8]           || [1, 1, 3, 5, 8]
+        [[1, 1], [3, [5, 8]]]     || [1, 1, 3, 5, 8]
+        [[1, [2, [3, [4, [5]]]]]] || [1, 2, 3, 4, 5]
     }
 
     @Unroll
@@ -208,13 +227,14 @@ class ListsSpecification extends Specification {
         */
 
         expect:
-        list.asImmutable().uniqueEx() == compressed
+        compress(list.asImmutable()) == compressed
+        list.asImmutable().compress() == compressed
 
         where:
-        list                                                                   | compressed
-        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] | ['a', 'b', 'c', 'd', 'e']
-        ['a', 'b', 'c']                                                        | ['a', 'b', 'c']
-        []                                                                     | []
+        list                                                                   || compressed
+        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] || ['a', 'b', 'c', 'a', 'd', 'e']
+        ['a', 'b', 'c']                                                        || ['a', 'b', 'c']
+        []                                                                     || []
     }
 
     @Unroll
@@ -229,13 +249,14 @@ class ListsSpecification extends Specification {
          */
 
         expect:
+        pack(list.asImmutable()) == packed
         list.asImmutable().pack() == packed
 
         where:
-        list                                                                   | packed
-        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] | [['a', 'a', 'a', 'a'], ['b'], ['c', 'c'], ['a', 'a'], ['d'], ['e', 'e', 'e', 'e']]
-        ['a', 'b', 'c']                                                        | [['a'], ['b'], ['c']]
-        []                                                                     | []
+        list                                                                   || packed
+        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] || [['a', 'a', 'a', 'a'], ['b'], ['c', 'c'], ['a', 'a'], ['d'], ['e', 'e', 'e', 'e']]
+        ['a', 'b', 'c']                                                        || [['a'], ['b'], ['c']]
+        []                                                                     || []
     }
 
     @Unroll
@@ -249,6 +270,7 @@ class ListsSpecification extends Specification {
         res0: List[(Int, Symbol)] = List((4,'a), (1,'b), (2,'c), (2,'a), (1,'d), (4,'e))
          */
         expect:
+        encode(list.asImmutable()) == encoded
         list.asImmutable().encode() == encoded
 
         where:
@@ -259,7 +281,7 @@ class ListsSpecification extends Specification {
     }
 
     @Unroll
-    "P11 (*) Modified run-length encoding of #list"(List list, List encodeModified) {
+    "P11 (*) Modified run-length encoding of #list"(List list, List encoded) {
         /*
         P11 (*) Modified run-length encoding.
         Modify the result of problem P10 in such a way that if an element has no duplicates it is simply copied into the result list.asImmutable(). Only elements with duplicates are transferred as (N, E) terms.
@@ -270,13 +292,14 @@ class ListsSpecification extends Specification {
          */
 
         expect:
-        list.asImmutable().encodeModified() == encodeModified
+        encodeModified(list.asImmutable()) == encoded
+        list.asImmutable().encodeModified() == encoded
 
         where:
-        list                                                                   | encodeModified
-        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] | [[4, 'a'], 'b', [2, 'c'], [2, 'a'], 'd', [4, 'e']]
-        ['a', 'b', 'c']                                                        | ['a', 'b', 'c']
-        []                                                                     | []
+        list                                                                   || encoded
+        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] || [[4, 'a'], 'b', [2, 'c'], [2, 'a'], 'd', [4, 'e']]
+        ['a', 'b', 'c']                                                        || ['a', 'b', 'c']
+        []                                                                     || []
 
     }
 
@@ -292,13 +315,14 @@ class ListsSpecification extends Specification {
          */
 
         expect:
+        decode(list.asImmutable()) == decoded
         list.asImmutable().decode() == decoded
 
         where:
-        list                                                         | decoded
-        [[4, 'a'], [1, 'b'], [2, 'c'], [2, 'a'], [1, 'd'], [4, 'e']] | ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
-        [[4, 'a'], 'b', [2, 'c'], [2, 'a'], 'd', [4, 'e']]           | ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
-        []                                                           | []
+        list                                                         || decoded
+        [[4, 'a'], [1, 'b'], [2, 'c'], [2, 'a'], [1, 'd'], [4, 'e']] || ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
+        [[4, 'a'], 'b', [2, 'c'], [2, 'a'], 'd', [4, 'e']]           || ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e']
+        []                                                           || []
 
     }
 
@@ -314,17 +338,18 @@ class ListsSpecification extends Specification {
          */
 
         expect:
+        encodeDirect(list.asImmutable()) == encoded
         list.asImmutable().encodeDirect() == encoded
 
         where:
-        list                                                                   | encoded
-        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] | [[4, 'a'], [1, 'b'], [2, 'c'], [2, 'a'], [1, 'd'], [4, 'e']]
-        ['a', 'b', 'c']                                                        | [[1, 'a'], [1, 'b'], [1, 'c']]
-        []                                                                     | []
+        list                                                                   || encoded
+        ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e'] || [[4, 'a'], [1, 'b'], [2, 'c'], [2, 'a'], [1, 'd'], [4, 'e']]
+        ['a', 'b', 'c']                                                        || [[1, 'a'], [1, 'b'], [1, 'c']]
+        []                                                                     || []
     }
 
     @Unroll
-    "P14 (*) Duplicate the elements of #list"(List list, List duplicate) {
+    "P14 (*) Duplicate the elements of #list"(List list, List duplicated) {
         /*
         P14 (*) Duplicate the elements of a list.
         Example:
@@ -333,16 +358,17 @@ class ListsSpecification extends Specification {
          */
 
         expect:
-        list.asImmutable().duplicate() == duplicate
+        duplicate(list.asImmutable()) == duplicated
+        list.asImmutable().duplicate() == duplicated
 
         where:
-        list                           | duplicate
-        ['a', 'b', 'c', 'c', 'd', 'e'] | ['a', 'a', 'b', 'b', 'c', 'c', 'c', 'c', 'd', 'd', 'e', 'e']
-        []                             | []
+        list                           || duplicated
+        ['a', 'b', 'c', 'c', 'd', 'e'] || ['a', 'a', 'b', 'b', 'c', 'c', 'c', 'c', 'd', 'd', 'e', 'e']
+        []                             || []
     }
 
     @Unroll
-    "P15 (**) Duplicate the elements of #list a given number of times"(List list, int n, List duplicate) {
+    "P15 (**) Duplicate the elements of #list a given number of times"(List list, int n, List duplicated) {
         /*
         P15 (**) Duplicate the elements of a list a given number of times.
         Example:
@@ -351,13 +377,14 @@ class ListsSpecification extends Specification {
          */
 
         expect:
-        list.asImmutable().duplicateN(n) == duplicate
+        duplicateN(list.asImmutable(), n) == duplicated
+        list.asImmutable().duplicateN(n) == duplicated
 
         where:
-        list                           | n | duplicate
-        ['a', 'b', 'c', 'c', 'd', 'e'] | 1 | ['a', 'b', 'c', 'c', 'd', 'e']
-        ['a', 'b', 'c', 'c', 'd', 'e'] | 2 | ['a', 'a', 'b', 'b', 'c', 'c', 'c', 'c', 'd', 'd', 'e', 'e']
-        ['a', 'b', 'c', 'c', 'd', 'e'] | 3 | ['a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'c', 'c', 'c', 'c', 'd', 'd', 'd', 'e', 'e', 'e']
+        list                           | n || duplicated
+        ['a', 'b', 'c', 'c', 'd', 'e'] | 1 || ['a', 'b', 'c', 'c', 'd', 'e']
+        ['a', 'b', 'c', 'c', 'd', 'e'] | 2 || ['a', 'a', 'b', 'b', 'c', 'c', 'c', 'c', 'd', 'd', 'e', 'e']
+        ['a', 'b', 'c', 'c', 'd', 'e'] | 3 || ['a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'c', 'c', 'c', 'c', 'd', 'd', 'd', 'e', 'e', 'e']
     }
 
     @Unroll
@@ -370,14 +397,14 @@ class ListsSpecification extends Specification {
          */
 
         expect:
-        list.asImmutable().dropEx(3) == dropped
+        dropNth(list.asImmutable(), 3) == dropped
 
         where:
-        list                                                    | dropped
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | ['a', 'b', 'd', 'e', 'g', 'h', 'j', 'k']
-        ['a', 'b', 'c']                                         | ['a', 'b']
-        ['a', 'b']                                              | ['a', 'b']
-        []                                                      | []
+        list                                                    || dropped
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] || ['a', 'b', 'd', 'e', 'g', 'h', 'j', 'k']
+        ['a', 'b', 'c']                                         || ['a', 'b']
+        ['a', 'b']                                              || ['a', 'b']
+        []                                                      || []
     }
 
     @Unroll
@@ -391,14 +418,15 @@ class ListsSpecification extends Specification {
         res0: (List[Symbol], List[Symbol]) = (List('a, 'b, 'c),List('d, 'e, 'f, 'g, 'h, 'i, 'j, 'k))
          */
         expect:
-        list.asImmutable().splitEx(3) == split
+        WorkingWithLists.split(list.asImmutable(), 3) == split
+        list.asImmutable().splitN(3) == split
 
         where:
-        list                                                    | split
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | [['a', 'b', 'c'], ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k']]
-        ['a', 'b', 'c']                                         | [['a', 'b', 'c'], []]
-        ['a', 'b']                                              | [['a', 'b'], []]
-        []                                                      | [[], []]
+        list                                                    || split
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] || [['a', 'b', 'c'], ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k']]
+        ['a', 'b', 'c']                                         || [['a', 'b', 'c'], []]
+        ['a', 'b']                                              || [['a', 'b'], []]
+        []                                                      || [[], []]
     }
 
     @Unroll
@@ -412,14 +440,15 @@ class ListsSpecification extends Specification {
         res0: List[Symbol] = List('d, 'e, 'f, 'g)
          */
         expect:
+        WorkingWithLists.slice(list.asImmutable(), 3, 7) == slice
         list.asImmutable().slice(3, 7) == slice
 
         where:
-        list                                                    | slice
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | ['d', 'e', 'f', 'g']
-        ['a', 'b', 'c', 'd']                                    | ['d']
-        ['a', 'b', 'c']                                         | []
-        []                                                      | []
+        list                                                    || slice
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] || ['d', 'e', 'f', 'g']
+        ['a', 'b', 'c', 'd']                                    || ['d']
+        ['a', 'b', 'c']                                         || []
+        []                                                      || []
     }
 
     @Unroll
@@ -434,16 +463,17 @@ class ListsSpecification extends Specification {
         res1: List[Symbol] = List('j, 'k, 'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i)
          */
         expect:
-        list.asImmutable().rotate(3)
+        rotate(list.asImmutable(), n) == rotated
+        list.asImmutable().rotate(n) == rotated
 
         where:
-        list                                                    | n  | rotated
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | 3  | ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'a', 'b', 'c']
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | 0  | ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | -2 | ['j', 'k', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
-        ['a']                                                   | 1  | ['a']
-        ['a']                                                   | 3  | ['a']
-        []                                                      | 0  | []
+        list                                                    | n  || rotated
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | 3  || ['d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'a', 'b', 'c']
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | 0  || ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'] | -2 || ['j', 'k', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+        ['a']                                                   | 1  || ['a']
+        ['a']                                                   | 3  || ['a']
+        []                                                      | 0  || []
     }
 
     @Unroll
@@ -457,14 +487,14 @@ class ListsSpecification extends Specification {
         res0: (List[Symbol], Symbol) = (List('a, 'c, 'd),'b)
          */
         expect:
-        list.asImmutable().removeAt(i) == removed
+        removeAt(list.asImmutable(), i) == removed
 
         where:
-        list                 | i | removed
-        ['a', 'b', 'c', 'd'] | 1 | [['a', 'c', 'd'], 'b']
-        ['a', 'b', 'c', 'd'] | 0 | [['b', 'c', 'd'], 'a']
-        ['a', 'b', 'c', 'd'] | 5 | ['a', 'b', 'c', 'd']
-        []                   | 0 | []
+        list                 | i || removed
+        ['a', 'b', 'c', 'd'] | 1 || [['a', 'c', 'd'], 'b']
+        ['a', 'b', 'c', 'd'] | 0 || [['b', 'c', 'd'], 'a']
+        ['a', 'b', 'c', 'd'] | 5 || ['a', 'b', 'c', 'd']
+        []                   | 0 || []
 
     }
 
@@ -477,34 +507,36 @@ class ListsSpecification extends Specification {
         res0: List[Symbol] = List('a, 'new, 'b, 'c, 'd)
          */
         expect:
+        insertAt(list.asImmutable(), 'n', i) == inserted
         list.asImmutable().insertAt('n', i) == inserted
 
         where:
-        list                 | i | inserted
-        ['a', 'b', 'c', 'd'] | 1 | ['a', 'n', 'b', 'c', 'd']
-        ['a', 'b', 'c', 'd'] | 0 | ['n', 'a', 'b', 'c', 'd']
-        ['a', 'b', 'c', 'd'] | 4 | ['a', 'b', 'c', 'd', 'n']
-        ['a', 'b', 'c', 'd'] | 5 | ['a', 'b', 'c', 'd', 'n'] //TODO should throw exception
-        []                   | 0 | ['n']
+        list                 | i || inserted
+        ['a', 'b', 'c', 'd'] | 1 || ['a', 'n', 'b', 'c', 'd']
+        ['a', 'b', 'c', 'd'] | 0 || ['n', 'a', 'b', 'c', 'd']
+        ['a', 'b', 'c', 'd'] | 4 || ['a', 'b', 'c', 'd', 'n']
+        ['a', 'b', 'c', 'd'] | 5 || ['a', 'b', 'c', 'd', 'n']
+        []                   | 0 || ['n']
 
     }
 
     @Unroll
-    "P22 (*) Create a list containing all integers within a given #range"(Range range, List expanded) {
+    "P22 (*) Create a list containing all integers within a given #from .. #to"(int from, int to, List expanded) {
         /*
         Example:
         scala> range(4, 9)
         res0: List[Int] = List(4, 5, 6, 7, 8, 9)
          */
         expect:
-        range == expanded
+        range(from, to) == expanded
+        from..to == expanded
 
         where:
-        range | expanded
-        4..9  | [4, 5, 6, 7, 8, 9]
-        9..4  | [9, 8, 7, 6, 5, 4]
-        0..0  | [0]
-        0..-2 | [0, -1, -2]
+        from | to || expanded
+        4    | 9  || [4, 5, 6, 7, 8, 9]
+        9    | 4  || [9, 8, 7, 6, 5, 4]
+        0    | 0  || [0]
+        0    | -2 || [0, -1, -2]
     }
 
     @Unroll
@@ -524,9 +556,9 @@ class ListsSpecification extends Specification {
         expect list, hasItems(*select)
 
         where:
-        list                                     | n
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] | 3
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] | 8
+        list                                     || n
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] || 3
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] || 8
 
     }
 
@@ -546,9 +578,9 @@ class ListsSpecification extends Specification {
         thrown(IllegalArgumentException)
 
         where:
-        list  | n
-        ['a'] | 3
-        []    | 0
+        list  || n
+        ['a'] || 3
+        []    || 0
 
     }
 
@@ -606,23 +638,22 @@ class ListsSpecification extends Specification {
                  */
 
         expect:
-        that list.asImmutable().combinations(n), hasSize(expectedNoOfCombinations)
-        that list.asImmutable().combinations2(n), hasSize(expectedNoOfCombinations)
+        that combinations(list.asImmutable(), n), hasSize(expectedNoOfCombinations)
 
         where:
-        list                           | n | expectedNoOfCombinations
-        ['a', 'b', 'c', 'd', 'e', 'f'] | 3 | 20
-        ['a', 'b', 'c', 'd', 'e', 'f'] | 4 | 15
-        ['a', 'b', 'c', 'd', 'e', 'f'] | 5 | 6
-        ['a', 'b', 'c', 'd', 'e', 'f'] | 6 | 1
-        ['a', 'b', 'c', 'd', 'e', 'f'] | 0 | 0
-        []                             | 6 | 0
-        []                             | 0 | 0
+        list                           | n || expectedNoOfCombinations
+        ['a', 'b', 'c', 'd', 'e', 'f'] | 3 || 20
+        ['a', 'b', 'c', 'd', 'e', 'f'] | 4 || 15
+        ['a', 'b', 'c', 'd', 'e', 'f'] | 5 || 6
+        ['a', 'b', 'c', 'd', 'e', 'f'] | 6 || 1
+        ['a', 'b', 'c', 'd', 'e', 'f'] | 0 || 0
+        []                             | 6 || 0
+        []                             | 0 || 0
 
     }
 
     @Unroll
-    "P27 (**) Group the elements of #list into disjoint subsets of #n"(List list, int n, List grouping, int expectedNoOfGroups, int expectedNoOfGroupNs) {
+    "P27 (**) Group the elements of #list into disjoint subsets of #group"(List group, int noOfCombinations) {
         /*
         P27 (**) Group the elements of a set into disjoint subsets.
         a) In how many ways can a group of 9 people work in 3 disjoint subgroups of 2, 3 and 4 persons? Write a function that generates all the possibilities.
@@ -640,22 +671,21 @@ class ListsSpecification extends Specification {
 
         You may find more about this combinatorial problem in a good book on discrete mathematics under the term "multinomial coefficients".
          */
+        given:
+        def list = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+
         expect:
-        that list.asImmutable().group(n), hasSize(expectedNoOfGroups)
-        that list.asImmutable().groupN(grouping), hasSize(expectedNoOfGroupNs)
+        that group3(list.asImmutable(), group), hasSize(noOfCombinations)
+        that list.asImmutable().group3(group), hasSize(noOfCombinations)
 
         where:
-        list                           | n | grouping  | expectedNoOfGroups | expectedNoOfGroupNs
-        []                             | 0 | [2, 2, 2] | 0                  | 0
-        ['a', 'b', 'c']                | 0 | [2, 2, 2] | 0                  | 0
-        ['a', 'b', 'c']                | 5 | [2, 2, 2] | 0                  | 0
-        ['a', 'b', 'c']                | 1 | [2, 2, 2] | 1                  | 0
-        ['a', 'b', 'c']                | 3 | [2, 2, 2] | 1                  | 0
-        ['a', 'b', 'c', 'd']           | 3 | [1, 3]    | 6                  | 4
-        ['a', 'b', 'c', 'd']           | 3 | [3, 1]    | 6                  | 4
-        ['a', 'b', 'c', 'd']           | 3 | [2, 2]    | 6                  | 3
-        ['a', 'b', 'c', 'd', 'e', 'f'] | 3 | [2, 2, 2] | 90                 | 15
-
+        group     || noOfCombinations
+        [2, 3, 4] || 1260
+        [2, 2, 5] || 756
+        [5, 2, 2] || 756
+        [3, 3, 3] || 1680
+        [4, 4, 1] || 630
+        [1, 4, 4] || 630
     }
 
     @Unroll
@@ -680,13 +710,13 @@ class ListsSpecification extends Specification {
         lists.asImmutable().lsortFreq() == expected2
 
         where:
-        lists                                                             | expected                                                          | expected2
-        []                                                                | []                                                                | []
-        [[]]                                                              | [[]]                                                              | [[]]
-        [['a', 'b', 'c']]                                                 | [['a', 'b', 'c']]                                                 | [['a', 'b', 'c']]
-        [['a'], ['c'], ['b']]                                             | [['a'], ['c'], ['b']]                                             | [['a'], ['c'], ['b']]
-        [['b', 'c'], ['c'], ['f', 'g', 'h'], ['i', 'j', 'k'], ['d', 'e']] | [['c'], ['b', 'c'], ['d', 'e'], ['f', 'g', 'h'], ['i', 'j', 'k']] | [['c'], ['b', 'c'], ['d', 'e'], ['f', 'g', 'h'], ['i', 'j', 'k']]
-        [['f', 'g', 'h'], ['b', 'c'], ['c'], ['i', 'j', 'k'], ['d', 'e']] | [['c'], ['b', 'c'], ['d', 'e'], ['f', 'g', 'h'], ['i', 'j', 'k']] | [['c'], ['f', 'g', 'h'], ['i', 'j', 'k'], ['b', 'c'], ['d', 'e']]
+        lists                                                             || expected                                                          || expected2
+        []                                                                || []                                                                || []
+        [[]]                                                              || [[]]                                                              || [[]]
+        [['a', 'b', 'c']]                                                 || [['a', 'b', 'c']]                                                 || [['a', 'b', 'c']]
+        [['a'], ['c'], ['b']]                                             || [['a'], ['c'], ['b']]                                             || [['a'], ['c'], ['b']]
+        [['b', 'c'], ['c'], ['f', 'g', 'h'], ['i', 'j', 'k'], ['d', 'e']] || [['c'], ['b', 'c'], ['d', 'e'], ['f', 'g', 'h'], ['i', 'j', 'k']] || [['c'], ['b', 'c'], ['d', 'e'], ['f', 'g', 'h'], ['i', 'j', 'k']]
+        [['f', 'g', 'h'], ['b', 'c'], ['c'], ['i', 'j', 'k'], ['d', 'e']] || [['c'], ['b', 'c'], ['d', 'e'], ['f', 'g', 'h'], ['i', 'j', 'k']] || [['c'], ['f', 'g', 'h'], ['i', 'j', 'k'], ['b', 'c'], ['d', 'e']]
 
     }
 }
