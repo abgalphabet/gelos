@@ -1,11 +1,20 @@
-# Ninety-Nine **_Groovy_** Problem series
+# Ninety-Nine **_Groovy_** Problems
 
 This is adaptation of the [Ninety-Nine Scala Problems](http://aperiodic.net/phil/scala/s-99/) from [Phil Gold](http://aperiodic.net/phil/).
 
-I use the ninety-nine problems as the material to deepen my _functional style_ programming knownledge in different programming languages.
+I start this Ninety-Nine <_programming language_> Problems Series as I am a big fan of functional and immutable style programming after I done the Ninety-Nine Scala Problems.
+
+I use the ninety-nine problems as the material to deepen my _functional_ programming knownledge in different programming languages like:
+
+* Scala
+* Groovy
+* Python
+* Go
+* Rust
+* ...
 
 
-The problems includes:
+The ninety-nine problems include:
 
 * [Working with lists](src/test/groovy/gordius/lists/ListsSpecification.groovy)
 * Arithmetic
