@@ -2,12 +2,12 @@
 
 This is adaptation of the [Ninety-Nine Scala Problems](http://aperiodic.net/phil/scala/s-99/) from [Phil Gold](http://aperiodic.net/phil/).
 
-I use the ninety-nine problems as the material to deepen my _functional style_ programming knownledge with different programming languages.
+I use the ninety-nine problems as the material to deepen my _functional style_ programming knownledge in different programming languages.
 
 
 The problems includes:
 
-* Working with lists
+* [Working with lists](src/test/groovy/gordius/lists/ListsSpecification.groovy)
 * Arithmetic
 * Logic and Codes
 * Binary Trees
